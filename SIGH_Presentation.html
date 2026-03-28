@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGH — Révolution Numérique Hospitalière | Sud d'Haïti</title>
+  <style>
+    /* =====================================================
+       RESET & VARIABLES
+    ===================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #1a5f7a;
+      --blue-light: #2a7f9a;
+      --blue-pale:  #e8f4f8;
+      --green:      #2ecc71;
+      --green-dark: #27ae60;
+      --text-dark:  #1a2332;
+      --text-mid:   #4a5568;
+      --text-light: #718096;
+      --bg:         #f7f9fc;
+      --white:      #ffffff;
+      --shadow-sm:  0 2px 8px rgba(26,95,122,.10);
+      --shadow-md:  0 6px 24px rgba(26,95,122,.14);
+      --shadow-lg:  0 16px 48px rgba(26,95,122,.18);
+      --radius:     12px;
+      --radius-lg:  20px;
+      --transition: .35s cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* =====================================================
+       PROGRESS BAR
+    ===================================================== */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 4px; width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      z-index: 9999; transition: width .2s ease;
+    }
+
+    /* =====================================================
+       TOP NAV
+    ===================================================== */
+    nav {
+      position: fixed; top: 4px; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 64px;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(26,95,122,.08);
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 1.15rem; color: var(--blue);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--green); }
+
+    .nav-links {
+      display: flex; gap: 6px; list-style: none;
+    }
+
+    .nav-links a {
+      display: block; padding: 6px 14px; border-radius: 8px;
+      font-size: .82rem; font-weight: 600; color: var(--text-mid);
+      text-decoration: none; letter-spacing: .02em;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: var(--blue-pale); color: var(--blue);
+    }
+
+    .nav-cta {
+      padding: 8px 20px !important;
+      background: var(--green) !important; color: #fff !important;
+      border-radius: var(--radius) !important;
+    }
+
+    .nav-cta:hover { background: var(--green-dark) !important; }
+
+    /* =====================================================
+       SLIDE SYSTEM
+    ===================================================== */
+    .slide {
+      min-height: 100vh; padding: 100px 40px 60px;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+
+    .slide:nth-child(even) { background: var(--white); }
+    .slide:nth-child(odd)  { background: var(--bg); }
+
+    .slide-inner {
+      max-width: 1100px; margin: 0 auto; width: 100%;
+    }
+
+    /* SLIDE NUMBER BADGE */
+    .slide-badge {
+      display: inline-flex; align-items: center;
+      border-left: 3px solid var(--green);
+      padding: 3px 0 3px 12px;
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 20px; background: none;
+    }
+
+    /* SECTION TITLE */
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800; line-height: 1.15;
+      color: var(--text-dark); margin-bottom: 14px;
+    }
+
+    .section-title em {
+      font-style: normal; color: var(--blue);
+      position: relative;
+    }
+
+    .section-title em::after {
+      content: ''; position: absolute;
+      bottom: -2px; left: 0; right: 0; height: 3px;
+      background: var(--green); border-radius: 2px;
+    }
+
+    .section-subtitle {
+      font-size: 1.05rem; color: var(--text-light);
+      max-width: 640px; line-height: 1.7; margin-bottom: 48px;
+    }
+
+    /* =====================================================
+       ANIMATION CLASSES
+    ===================================================== */
+    .anim { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
+    .anim.delay-1 { transition-delay: .1s; }
+    .anim.delay-2 { transition-delay: .2s; }
+    .anim.delay-3 { transition-delay: .3s; }
+    .anim.delay-4 { transition-delay: .4s; }
+    .anim.delay-5 { transition-delay: .5s; }
+    .anim.delay-6 { transition-delay: .6s; }
+    .anim.visible { opacity: 1; transform: translateY(0); }
+
+    /* =====================================================
+       SLIDE 1 — HERO
+    ===================================================== */
+    #slide-1 {
+      background: linear-gradient(135deg, #0d3547 0%, #1a5f7a 55%, #1e7a5a 100%);
+      color: #fff; min-height: 100vh;
+    }
+
+    #slide-1 .slide-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center;
+      border-left: 3px solid var(--green);
+      padding: 3px 0 3px 12px;
+      font-size: .78rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(255,255,255,.75);
+      margin-bottom: 24px; background: none;
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      font-weight: 900; line-height: 1.1; color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .hero-title .accent { color: var(--green); }
+
+    .hero-desc {
+      font-size: 1.05rem; color: rgba(255,255,255,.78);
+      line-height: 1.75; margin-bottom: 36px; max-width: 480px;
+    }
+
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 26px; border-radius: var(--radius);
+      font-size: .9rem; font-weight: 700; cursor: pointer;
+      text-decoration: none; border: none; transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--green); color: #fff;
+    }
+    .btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(46,204,113,.4); }
+
+    .btn-outline {
+      background: transparent; color: #fff;
+      border: 2px solid rgba(255,255,255,.4);
+    }
+    .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+
+    /* HERO VISUAL */
+    .hero-visual {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    .perspective-card {
+      background: rgba(255,255,255,.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      transition: var(--transition);
+    }
+
+    .perspective-card:hover {
+      background: rgba(255,255,255,.16);
+      transform: translateX(6px);
+    }
+
+    .perspective-card .p-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .perspective-card .p-role {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--green); margin-bottom: 6px;
+    }
+    .perspective-card .p-quote {
+      font-size: .92rem; color: rgba(255,255,255,.85); line-height: 1.6;
+      font-style: italic;
+    }
+
+    /* STATS ROW */
+    .hero-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+      background: rgba(255,255,255,.15); border-radius: var(--radius);
+      overflow: hidden; margin-top: 12px;
+    }
+
+    .stat-item {
+      background: rgba(255,255,255,.06);
+      padding: 18px 16px; text-align: center;
+    }
+
+    .stat-num { font-size: 1.8rem; font-weight: 900; color: var(--green); }
+    .stat-label { font-size: .72rem; color: rgba(255,255,255,.65); margin-top: 2px; letter-spacing: .04em; }
+
+    /* =====================================================
+       SLIDE 2 — PROBLÈMES
+    ===================================================== */
+    .problems-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px; margin-bottom: 40px;
+    }
+
+    .problem-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 28px 24px; box-shadow: var(--shadow-sm);
+      border-top: 4px solid #e53e3e;
+      transition: var(--transition);
+      cursor: default;
+    }
+
+    .problem-card:hover {
+      transform: translateY(-6px); box-shadow: var(--shadow-md);
+    }
+
+    .problem-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: #fff5f5; display: flex; align-items: center;
+      justify-content: center; font-size: 1.5rem; margin-bottom: 16px;
+    }
+
+    .problem-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+    .problem-card p  { font-size: .87rem; color: var(--text-light); line-height: 1.65; }
+
+    .problem-impact {
+      display: inline-block; margin-top: 12px;
+      font-size: .75rem; font-weight: 700; color: #e53e3e;
+      background: #fff5f5; padding: 3px 10px; border-radius: 20px;
+    }
+
+    /* REALITY BANNER */
+    .reality-banner {
+      background: linear-gradient(90deg, var(--blue) 0%, var(--blue-light) 100%);
+      border-radius: var(--radius); padding: 22px 32px;
+      display: flex; align-items: center; gap: 20px; color: #fff;
+    }
+
+    .reality-banner .rb-icon { font-size: 2rem; flex-shrink: 0; }
+    .reality-banner p { font-size: .95rem; line-height: 1.65; }
+    .reality-banner strong { color: var(--green); }
+
+    /* =====================================================
+       SLIDE 3 — SOLUTION
+    ===================================================== */
+    .solution-intro {
+      display: grid; grid-template-columns: 1fr 2fr; gap: 40px;
+      align-items: start; margin-bottom: 48px;
+    }
+
+    .solution-tag {
+      background: linear-gradient(135deg, var(--blue), var(--blue-light));
+      color: #fff; border-radius: var(--radius-lg); padding: 28px 24px;
+      text-align: center;
+    }
+
+    .solution-tag .big-num { font-size: 3rem; font-weight: 900; color: var(--green); }
+    .solution-tag p { font-size: .85rem; color: rgba(255,255,255,.8); margin-top: 6px; }
+
+    .solution-text h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; color: var(--blue); }
+    .solution-text p  { font-size: .93rem; color: var(--text-mid); line-height: 1.75; }
+
+    .modules-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .module-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      padding: 30px 26px; box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(26,95,122,.08);
+      transition: var(--transition); cursor: default;
+      position: relative; overflow: hidden;
+    }
+
+    .module-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+    }
+
+    .module-card:hover {
+      transform: translateY(-8px); box-shadow: var(--shadow-lg);
+      border-color: rgba(26,95,122,.2);
+    }
+
+    .module-icon {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: var(--blue-pale); display: flex; align-items: center;
+      justify-content: center; font-size: 1.6rem; margin-bottom: 18px;
+    }
+
+    .module-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; color: var(--text-dark); }
+    .module-card .module-sub { font-size: .78rem; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+    .module-card p  { font-size: .87rem; color: var(--text-light); line-height: 1.65; }
+
+    .module-features {
+      list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 6px;
+    }
+
+    .module-features li {
+      font-size: .83rem; color: var(--text-mid);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .module-features li::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0;
+    }
+
+    /* =====================================================
+       SLIDE 4 — TECHNIQUE
+    ===================================================== */
+    .tech-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+    }
+
+    .tech-column h3 {
+      font-size: 1rem; font-weight: 700; color: var(--blue);
+      margin-bottom: 18px; padding-bottom: 10px;
+      border-bottom: 2px solid var(--blue-pale);
+    }
+
+    .tech-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 16px; border-radius: var(--radius);
+      transition: var(--transition); margin-bottom: 12px;
+    }
+
+    .tech-item:hover { background: var(--blue-pale); }
+
+    .tech-item-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--blue-pale); display: flex; align-items: center;
+      justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+    }
+
+    .tech-item-body h4 { font-size: .92rem; font-weight: 700; margin-bottom: 4px; }
+    .tech-item-body p  { font-size: .82rem; color: var(--text-light); line-height: 1.6; }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+    .tag {
+      font-size: .72rem; font-weight: 700; padding: 3px 10px;
+      border-radius: 20px; letter-spacing: .04em;
+    }
+
+    .tag-blue  { background: var(--blue-pale); color: var(--blue); }
+    .tag-green { background: #eafaf1; color: var(--green-dark); }
+    .tag-gray  { background: #f0f2f5; color: var(--text-mid); }
+
+    /* OFFLINE HIGHLIGHT */
+    .offline-highlight {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #0d3547, var(--blue));
+      border-radius: var(--radius-lg); padding: 28px 32px;
+      display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center;
+      color: #fff;
+    }
+
+    .offline-highlight .oh-icon { font-size: 3rem; }
+    .offline-highlight h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
+    .offline-highlight p  { font-size: .9rem; color: rgba(255,255,255,.8); line-height: 1.7; }
+    .offline-highlight strong { color: var(--green); }
+
+    /* =====================================================
+       SLIDE 5 — BUDGET
+    ===================================================== */
+    .budget-layout {
+      display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: start;
+    }
+
+    /* TABLE */
+    .budget-table-wrap { overflow-x: auto; }
+
+    table.budget-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      font-size: .88rem;
+    }
+
+    .budget-table thead tr {
+      background: var(--blue); color: #fff;
+    }
+
+    .budget-table th {
+      padding: 13px 16px; text-align: left;
+      font-size: .78rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .budget-table th:first-child { border-radius: var(--radius) 0 0 0; }
+    .budget-table th:last-child  { border-radius: 0 var(--radius) 0 0; }
+
+    .budget-table tbody tr {
+      transition: var(--transition);
+    }
+
+    .budget-table tbody tr:nth-child(even) { background: var(--blue-pale); }
+    .budget-table tbody tr:hover { background: #d0eaf2; }
+
+    .budget-table td {
+      padding: 13px 16px; border-bottom: 1px solid rgba(26,95,122,.06);
+    }
+
+    .budget-table .amount {
+      font-weight: 700; color: var(--blue); white-space: nowrap;
+    }
+
+    .budget-table .pct-bar {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .pct-fill {
+      height: 6px; border-radius: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+    }
+
+    .pct-label { font-size: .78rem; font-weight: 700; color: var(--text-mid); white-space: nowrap; }
+
+    .budget-table tfoot td {
+      font-weight: 800; font-size: .95rem; color: var(--blue);
+      padding-top: 16px;
+    }
+
+    /* PIE CHART */
+    .pie-wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+    .pie-chart {
+      width: 200px; height: 200px; border-radius: 50%;
+      position: relative;
+      background: conic-gradient(
+        var(--blue)         0% 40%,
+        #e67e22             40% 70%,
+        var(--green)        70% 90%,
+        #9b59b6             90% 100%
+      );
+      box-shadow: 0 8px 32px rgba(26,95,122,.25);
+    }
+
+    .pie-chart::after {
+      content: ''; position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 96px; height: 96px; background: var(--white);
+      border-radius: 50%; box-shadow: inset 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .pie-center {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      z-index: 2; text-align: center;
+      font-size: .7rem; font-weight: 800; color: var(--text-dark);
+      line-height: 1.3;
+    }
+
+    .legend { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+
+    .legend-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; border-radius: var(--radius);
+      background: var(--white); box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .legend-item:hover { transform: translateX(4px); box-shadow: var(--shadow-md); }
+
+    .legend-dot {
+      width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0;
+    }
+
+    .legend-item span { font-size: .85rem; font-weight: 600; flex: 1; }
+    .legend-item b    { font-size: .85rem; color: var(--text-mid); }
+
+    /* =====================================================
+       SLIDE 6 — CTA / CONTACT
+    ===================================================== */
+    #slide-6 {
+      background: linear-gradient(135deg, #0d3547 0%, #1a5f7a 100%);
+    }
+
+    #slide-6 .section-title { color: #fff; }
+    #slide-6 .section-subtitle { color: rgba(255,255,255,.7); }
+
+    .cta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+      align-items: start;
+    }
+
+    .contact-form {
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--radius-lg); padding: 36px 32px;
+    }
+
+    .form-row { margin-bottom: 18px; }
+
+    .form-row label {
+      display: block; font-size: .8rem; font-weight: 700;
+      color: rgba(255,255,255,.75); text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 7px;
+    }
+
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
+      width: 100%; padding: 12px 16px;
+      background: rgba(255,255,255,.1);
+      border: 1.5px solid rgba(255,255,255,.2);
+      border-radius: var(--radius); color: #fff;
+      font-size: .9rem; font-family: inherit;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .form-row input::placeholder,
+    .form-row textarea::placeholder { color: rgba(255,255,255,.35); }
+
+    .form-row input:focus,
+    .form-row select:focus,
+    .form-row textarea:focus {
+      border-color: var(--green);
+      background: rgba(255,255,255,.15);
+      box-shadow: 0 0 0 3px rgba(46,204,113,.2);
+    }
+
+    .form-row select option { background: var(--blue); color: #fff; }
+    .form-row textarea { resize: vertical; min-height: 100px; }
+
+    .btn-submit {
+      width: 100%; padding: 14px; font-size: 1rem; font-weight: 800;
+      background: var(--green); color: #fff; border: none;
+      border-radius: var(--radius); cursor: pointer;
+      transition: var(--transition); letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .btn-submit:hover {
+      background: var(--green-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(46,204,113,.4);
+    }
+
+    /* CTA RIGHT SIDE */
+    .cta-right { display: flex; flex-direction: column; gap: 24px; }
+
+    .cta-highlight {
+      background: rgba(46,204,113,.15); border: 1px solid rgba(46,204,113,.3);
+      border-radius: var(--radius-lg); padding: 28px 26px; color: #fff;
+    }
+
+    .cta-highlight h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: var(--green); }
+    .cta-highlight p  { font-size: .9rem; color: rgba(255,255,255,.8); line-height: 1.7; }
+
+    .pilot-btn {
+      display: block; text-align: center;
+      padding: 18px 32px; font-size: 1.05rem; font-weight: 900;
+      background: linear-gradient(90deg, var(--green), #1abc9c);
+      color: #fff; border-radius: var(--radius-lg);
+      text-decoration: none; letter-spacing: .06em;
+      text-transform: uppercase;
+      transition: var(--transition);
+      box-shadow: 0 8px 32px rgba(46,204,113,.35);
+    }
+
+    .pilot-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 14px 40px rgba(46,204,113,.5);
+    }
+
+    /* TEAM CARDS */
+    .teams-section { display: flex; flex-direction: column; gap: 14px; }
+
+    .team-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(255,255,255,.45);
+      margin-bottom: 4px;
+    }
+
+    .team-card {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--radius); padding: 18px 22px;
+      color: #fff; transition: var(--transition);
+    }
+
+    .team-card:hover {
+      background: rgba(255,255,255,.13);
+      border-color: rgba(46,204,113,.35);
+      transform: translateX(4px);
+    }
+
+    .team-card-role {
+      font-size: .72rem; font-weight: 700; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--green); margin-bottom: 6px;
+    }
+
+    .team-card-name {
+      font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 4px;
+    }
+
+    .team-card-desc {
+      font-size: .83rem; color: rgba(255,255,255,.65); line-height: 1.55;
+    }
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+    footer {
+      background: #0a1f2b; color: rgba(255,255,255,.45);
+      text-align: center; padding: 24px 40px;
+      font-size: .78rem; letter-spacing: .04em;
+    }
+
+    footer strong { color: var(--green); }
+
+    /* =====================================================
+       SCROLL-TO-TOP
+    ===================================================== */
+    #scroll-top {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--blue); color: #fff; border: none;
+      font-size: 1.1rem; cursor: pointer;
+      box-shadow: var(--shadow-md); transition: var(--transition);
+      opacity: 0; pointer-events: none; z-index: 999;
+    }
+
+    #scroll-top.visible { opacity: 1; pointer-events: all; }
+    #scroll-top:hover { background: var(--blue-light); transform: translateY(-3px); }
+
+    /* =====================================================
+       TOAST NOTIFICATION
+    ===================================================== */
+    #toast {
+      position: fixed; bottom: 88px; right: 28px;
+      background: var(--blue); color: #fff;
+      padding: 14px 22px; border-radius: var(--radius);
+      font-size: .88rem; font-weight: 600;
+      box-shadow: var(--shadow-lg); z-index: 9999;
+      transform: translateY(20px); opacity: 0;
+      transition: var(--transition); pointer-events: none;
+    }
+
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .slide { padding: 90px 20px 50px; }
+      #slide-1 .slide-inner { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .tech-grid { grid-template-columns: 1fr; }
+      .budget-layout { grid-template-columns: 1fr; }
+      .cta-grid { grid-template-columns: 1fr; }
+      .solution-intro { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .problems-grid { grid-template-columns: 1fr; }
+      .modules-grid  { grid-template-columns: 1fr; }
+      .hero-stats    { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    /* =====================================================
+       DIVIDER WAVE
+    ===================================================== */
+    .wave-divider {
+      line-height: 0; overflow: hidden;
+    }
+
+    .wave-divider svg {
+      display: block; width: 100%; height: 60px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── PROGRESS BAR ── -->
+<div id="progress-bar"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="nav-logo" href="#slide-1">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="8" fill="#1a5f7a"/>
+      <path d="M14 7v14M7 14h14" stroke="#2ecc71" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    SIGH<span> Pro</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#slide-1" class="nav-link">Accueil</a></li>
+    <li><a href="#slide-2" class="nav-link">Problèmes</a></li>
+    <li><a href="#slide-3" class="nav-link">Solution</a></li>
+    <li><a href="#slide-4" class="nav-link">Technique</a></li>
+    <li><a href="#slide-5" class="nav-link">Budget</a></li>
+    <li><a href="#slide-6" class="nav-link nav-cta">Rejoindre</a></li>
+  </ul>
+</nav>
+
+<!-- ===================================================
+     SLIDE 1 — HERO
+=================================================== -->
+<section class="slide" id="slide-1">
+  <div class="slide-inner">
+    <!-- LEFT -->
+    <div>
+      <div class="hero-badge anim">
+        Système d'Information Hospitalier — Haïti
+      </div>
+      <h1 class="hero-title anim delay-1">
+        SIGH — Vers une<br/>
+        <span class="accent">Révolution Numérique</span><br/>
+        Hospitalière dans le<br/>
+        Sud d'Haïti
+      </h1>
+      <p class="hero-desc anim delay-2">
+        Transformer les soins de santé grâce à un système intégré, résilient et adapté aux réalités haïtiennes — conçu pour fonctionner même sans connexion internet stable ni électricité constante.
+      </p>
+      <div class="hero-btns anim delay-3">
+        <a href="#slide-3" class="btn btn-primary">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 7l5 5-5 5M6 12h12"/></svg>
+          Découvrir la Solution
+        </a>
+        <a href="#slide-6" class="btn btn-outline">Lancer le Pilote</a>
+      </div>
+      <div class="hero-stats anim delay-4">
+        <div class="stat-item">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Hôpitaux cibles</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">12</div>
+          <div class="stat-label">Modules intégrés</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Offline-First</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — PERSPECTIVES -->
+    <div class="hero-visual">
+      <div class="perspective-card anim delay-2">
+        <div class="p-icon">🏥</div>
+        <div class="p-role">Perspective — Médecin</div>
+        <p class="p-quote">
+          "Je perds 40 minutes à chercher le dossier de chaque patient. Avec SIGH, j'ai tout l'historique médical en 3 secondes — même quand le réseau tombe."
+        </p>
+      </div>
+      <div class="perspective-card anim delay-3">
+        <div class="p-icon">🤱</div>
+        <div class="p-role">Perspective — Patient</div>
+        <p class="p-quote">
+          "J'attends depuis 6h du matin. On a perdu mes résultats d'analyse. Avec SIGH, ma fiche suit mon parcours de soins de A à Z, sans jamais se perdre."
+        </p>
+      </div>
+      <div class="perspective-card anim delay-4">
+        <div class="p-icon">👩‍💼</div>
+        <div class="p-role">Perspective — Directeur</div>
+        <p class="p-quote">
+          "Je n'ai aucune donnée fiable sur nos stocks de médicaments ni sur nos capacités réelles. SIGH me donne un tableau de bord en temps réel pour décider vite."
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     SLIDE 2 — PROBLÈMES
+=================================================== -->
+<section class="slide" id="slide-2">
+  <div class="slide-inner">
+    <div class="slide-badge anim">Diagnostic terrain</div>
+    <h2 class="section-title anim delay-1">La réalité des hôpitaux<br/><em>haïtiens aujourd'hui</em></h2>
+    <p class="section-subtitle anim delay-2">
+      Ces défis ne sont pas des abstractions. Ils coûtent des vies chaque jour dans le département du Sud.
+    </p>
+
+    <div class="problems-grid">
+      <div class="problem-card anim delay-1">
+        <div class="problem-icon">📂</div>
+        <h3>Dossiers papier perdus</h3>
+        <p>Des années d'historique médical disparaissent en une inondation, un incendie ou simplement un déménagement de service. Le patient repart de zéro à chaque consultation.</p>
+        <span class="problem-impact">↑ 60% des consultations sans historique</span>
+      </div>
+      <div class="problem-card anim delay-2">
+        <div class="problem-icon">⏳</div>
+        <h3>Files d'attente interminables</h3>
+        <p>Enregistrement manuel, ordonnances manuscrites, réorientation sans communication entre services. Un patient peut attendre 6 heures pour une consultation de 10 minutes.</p>
+        <span class="problem-impact">↑ 4–8h d'attente moyenne</span>
+      </div>
+      <div class="problem-card anim delay-3">
+        <div class="problem-icon">📊</div>
+        <h3>Zéro données en temps réel</h3>
+        <p>Les directeurs prennent des décisions stratégiques à l'aveugle. Stocks de médicaments inconnus, capacité en lits non suivie, épidémies non détectées à temps.</p>
+        <span class="problem-impact">↑ Surcoûts logistiques +35%</span>
+      </div>
+      <div class="problem-card anim delay-4">
+        <div class="problem-icon">💊</div>
+        <h3>Ruptures de médicaments</h3>
+        <p>Sans gestion de stock informatisée, les commandes se font à l'intuition. Des médicaments essentiels manquent pendant que d'autres périment en réserve.</p>
+        <span class="problem-impact">↑ Gaspillage estimé à 25%</span>
+      </div>
+      <div class="problem-card anim delay-5">
+        <div class="problem-icon">⚡</div>
+        <h3>Délestages électriques fréquents</h3>
+        <p>La connexion internet et l'électricité sont intermittentes. Les solutions numériques classiques (cloud-only) tombent en panne avec l'hôpital, rendant la situation pire qu'avant.</p>
+        <span class="problem-impact">↑ 6–12h de délestage/jour</span>
+      </div>
+      <div class="problem-card anim delay-6">
+        <div class="problem-icon">🔒</div>
+        <h3>Confidentialité compromise</h3>
+        <p>Les dossiers papier circulent dans les couloirs, accessibles à tous. Il n'existe aucun contrôle d'accès aux informations sensibles des patients.</p>
+        <span class="problem-impact">↑ Zéro audit de sécurité</span>
+      </div>
+    </div>
+
+    <div class="reality-banner anim delay-1" style="margin-top:32px;">
+      <span class="rb-icon">🇭🇹</span>
+      <p>
+        Selon le <strong>Ministère de la Santé Publique et de la Population (MSPP)</strong>, plus de <strong>70% des hôpitaux publics haïtiens</strong> fonctionnent encore avec un système entièrement papier, sans aucun outil de gestion numérique intégré.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     SLIDE 3 — SOLUTION
+=================================================== -->
+<section class="slide" id="slide-3">
+  <div class="slide-inner">
+    <div class="slide-badge anim">Notre solution</div>
+    <h2 class="section-title anim delay-1">Une architecture<br/><em>modulaire et résiliente</em></h2>
+    <p class="section-subtitle anim delay-2">
+      SIGH est un écosystème numérique complet, conçu avec les équipes médicales haïtiennes pour s'adapter à leurs contraintes — pas l'inverse.
+    </p>
+
+    <div class="solution-intro anim delay-2">
+      <div class="solution-tag">
+        <div class="big-num">3</div>
+        <p>Piliers<br/>fondamentaux</p>
+        <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+          <div style="background:rgba(255,255,255,.15); border-radius:8px; padding:8px 12px; font-size:.82rem; color:rgba(255,255,255,.9);">🏛️ Administration</div>
+          <div style="background:rgba(255,255,255,.15); border-radius:8px; padding:8px 12px; font-size:.82rem; color:rgba(255,255,255,.9);">🩺 Médical</div>
+          <div style="background:rgba(255,255,255,.15); border-radius:8px; padding:8px 12px; font-size:.82rem; color:rgba(255,255,255,.9);">👤 Patient</div>
+        </div>
+      </div>
+      <div class="solution-text">
+        <h3>Une plateforme pensée pour Haïti</h3>
+        <p>
+          SIGH intègre tous les flux de l'hôpital dans une interface simple, traduite en français et en créole haïtien. L'architecture <strong>Offline-First</strong> garantit un fonctionnement complet même lors des délestages. La synchronisation s'effectue automatiquement dès le retour de la connexion — sans perte de données et sans intervention du personnel.
+        </p>
+        <div class="tag-row" style="margin-top:16px;">
+          <span class="tag tag-green">✓ Offline-First</span>
+          <span class="tag tag-blue">✓ Multilingue (FR/HT)</span>
+          <span class="tag tag-green">✓ Tablette & Desktop</span>
+          <span class="tag tag-blue">✓ Ouvert aux intégrations</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modules-grid">
+      <!-- MODULE 1 -->
+      <div class="module-card anim delay-1">
+        <div class="module-icon">🏛️</div>
+        <div class="module-sub">Pilier 1</div>
+        <h3>Module Médico-Administratif</h3>
+        <p>Gestion complète de l'établissement : de l'accueil du patient à la facturation, en passant par les ressources humaines et les stocks.</p>
+        <ul class="module-features">
+          <li>Admission, transfert, sortie de patients</li>
+          <li>Gestion des rendez-vous et agenda</li>
+          <li>Stocks & pharmacie (alertes seuil critique)</li>
+          <li>Comptabilité & facturation simplifiée</li>
+          <li>Ressources humaines (congés, gardes)</li>
+        </ul>
+      </div>
+      <!-- MODULE 2 -->
+      <div class="module-card anim delay-2">
+        <div class="module-icon">🩺</div>
+        <div class="module-sub">Pilier 2</div>
+        <h3>Module Médical Clinique</h3>
+        <p>Le cœur du système : un dossier patient numérique complet, partagé et accessible par tous les services autorisés.</p>
+        <ul class="module-features">
+          <li>Dossier Patient Électronique (DPE)</li>
+          <li>Prescriptions & ordonnances numériques</li>
+          <li>Résultats de laboratoire & imagerie</li>
+          <li>Suivi grossesse & protocoles spéciaux</li>
+          <li>Alertes médicales & interactions médicaments</li>
+        </ul>
+      </div>
+      <!-- MODULE 3 -->
+      <div class="module-card anim delay-3">
+        <div class="module-icon">👤</div>
+        <div class="module-sub">Pilier 3</div>
+        <h3>Interface Patient & Reporting</h3>
+        <p>Placer le patient au centre du système, avec des outils de communication et un tableau de bord décisionnel pour les gestionnaires.</p>
+        <ul class="module-features">
+          <li>Rappels de RDV par SMS (sans internet)</li>
+          <li>Résultats accessibles au patient</li>
+          <li>Tableau de bord temps réel (Directeur)</li>
+          <li>Rapports MSPP automatiques</li>
+          <li>Cartographie épidémiologique</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     SLIDE 4 — TECHNIQUE
+=================================================== -->
+<section class="slide" id="slide-4">
+  <div class="slide-inner">
+    <div class="slide-badge anim">Architecture Technique</div>
+    <h2 class="section-title anim delay-1">Des choix techniques<br/><em>dictés par le terrain</em></h2>
+    <p class="section-subtitle anim delay-2">
+      Chaque décision d'architecture a été validée face aux contraintes réelles des hôpitaux du département du Sud.
+    </p>
+
+    <div class="tech-grid">
+      <!-- COL 1 -->
+      <div class="tech-column anim delay-1">
+        <h3>🗄️ Stockage & Base de Données</h3>
+
+        <div class="tech-item">
+          <div class="tech-item-icon">🐘</div>
+          <div class="tech-item-body">
+            <h4>PostgreSQL — Stockage relationnel</h4>
+            <p>Base de données SQL robuste, open-source et éprouvée. Zéro licence à payer. Réplication locale sur chaque site hospitalier.</p>
+            <div class="tag-row">
+              <span class="tag tag-blue">SQL</span>
+              <span class="tag tag-green">Open Source</span>
+              <span class="tag tag-gray">Réplication</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-item">
+          <div class="tech-item-icon">🔄</div>
+          <div class="tech-item-body">
+            <h4>Synchronisation différentielle</h4>
+            <p>Seules les modifications sont synchronisées — pas tout le fichier. Économise la bande passante sur les connexions mobiles haïtiennes.</p>
+            <div class="tag-row">
+              <span class="tag tag-green">Faible bande passante</span>
+              <span class="tag tag-gray">Delta Sync</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-item">
+          <div class="tech-item-icon">💾</div>
+          <div class="tech-item-body">
+            <h4>Sauvegarde chiffrée quotidienne</h4>
+            <p>Backup automatique chiffré AES-256 sur disque dur local ET sur cloud (si disponible), avec rotation 90 jours.</p>
+            <div class="tag-row">
+              <span class="tag tag-blue">AES-256</span>
+              <span class="tag tag-green">Auto-backup</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COL 2 -->
+      <div class="tech-column anim delay-2">
+        <h3>🔐 Sécurité & Accès</h3>
+
+        <div class="tech-item">
+          <div class="tech-item-icon">🛡️</div>
+          <div class="tech-item-body">
+            <h4>RBAC — Contrôle d'accès par rôle</h4>
+            <p>Médecin, infirmier, administrateur, directeur : chaque rôle accède uniquement aux données qui le concernent.</p>
+            <div class="tag-row">
+              <span class="tag tag-blue">RBAC</span>
+              <span class="tag tag-gray">Audit log</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-item">
+          <div class="tech-item-icon">🔑</div>
+          <div class="tech-item-body">
+            <h4>Authentification 2 facteurs</h4>
+            <p>Mot de passe + code PIN physique ou OTP par SMS. Aucun compte partagé. Session automatiquement fermée après 15 min d'inactivité.</p>
+            <div class="tag-row">
+              <span class="tag tag-green">2FA</span>
+              <span class="tag tag-blue">Session auto-expiry</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-item">
+          <div class="tech-item-icon">📱</div>
+          <div class="tech-item-body">
+            <h4>Stack technologique accessible</h4>
+            <p>Python/FastAPI (backend), React (frontend), SQLite local + PostgreSQL central. Déployable sur un simple PC de bureau ou Raspberry Pi 4.</p>
+            <div class="tag-row">
+              <span class="tag tag-blue">Python</span>
+              <span class="tag tag-green">React</span>
+              <span class="tag tag-gray">Raspberry Pi</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OFFLINE BANNER -->
+      <div class="offline-highlight anim delay-3">
+        <div class="oh-icon">⚡</div>
+        <div>
+          <h3>Stratégie Offline-First — Le défi n°1 en Haïti</h3>
+          <p>
+            SIGH fonctionne à <strong>100%</strong> lors des délestages électriques grâce à une base de données locale sur chaque poste. Les données se synchronisent automatiquement au retour de la connexion. Un onduleur UPS de 4h est inclus dans le budget matériel.
+            <strong>Aucune donnée n'est jamais perdue.</strong> L'hôpital ne s'arrête plus quand l'électricité manque.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     SLIDE 5 — BUDGET
+=================================================== -->
+<section class="slide" id="slide-5">
+  <div class="slide-inner">
+    <div class="slide-badge anim">Plan Financier</div>
+    <h2 class="section-title anim delay-1">Budget & Ressources<br/><em>— Transparence totale</em></h2>
+    <p class="section-subtitle anim delay-2">
+      Un investissement raisonné sur 18 mois pour une transformation durable. Chaque dollar est justifié et tracé.
+    </p>
+
+    <div class="budget-layout">
+      <!-- TABLE -->
+      <div class="anim delay-2">
+        <div class="budget-table-wrap">
+          <table class="budget-table">
+            <thead>
+              <tr>
+                <th>Poste de Dépense</th>
+                <th>Montant (USD)</th>
+                <th>Répartition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Développement logiciel</strong><br/>
+                  <small style="color:#718096">Équipe 4 devs, 12 mois, tests & déploiement</small>
+                </td>
+                <td class="amount">$48 000</td>
+                <td>
+                  <div class="pct-bar">
+                    <div class="pct-fill" style="width:80px;"></div>
+                    <span class="pct-label">40%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Infrastructure & Matériel</strong><br/>
+                  <small style="color:#718096">Serveurs, tablettes, UPS, réseau LAN</small>
+                </td>
+                <td class="amount">$36 000</td>
+                <td>
+                  <div class="pct-bar">
+                    <div class="pct-fill" style="width:60px; background:linear-gradient(90deg,#e67e22,#f39c12);"></div>
+                    <span class="pct-label">30%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Formation du personnel</strong><br/>
+                  <small style="color:#718096">Ateliers, manuels créole/français, e-learning</small>
+                </td>
+                <td class="amount">$24 000</td>
+                <td>
+                  <div class="pct-bar">
+                    <div class="pct-fill" style="width:40px; background:linear-gradient(90deg,var(--green),#1abc9c);"></div>
+                    <span class="pct-label">20%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Maintenance & Support (an 1)</strong><br/>
+                  <small style="color:#718096">Hotline, mises à jour, technicien sur site</small>
+                </td>
+                <td class="amount">$12 000</td>
+                <td>
+                  <div class="pct-bar">
+                    <div class="pct-fill" style="width:20px; background:linear-gradient(90deg,#9b59b6,#8e44ad);"></div>
+                    <span class="pct-label">10%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td><strong>TOTAL PROJET — 18 mois</strong></td>
+                <td class="amount" style="color:var(--green)">$120 000</td>
+                <td><span class="pct-label" style="font-weight:800">100%</span></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- COMPARAISON -->
+        <div style="margin-top:28px; background:var(--white); border-radius:var(--radius); padding:20px 24px; box-shadow:var(--shadow-sm);">
+          <h4 style="font-size:.9rem; font-weight:800; color:var(--blue); margin-bottom:14px;">Comparaison avec des solutions similaires</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; text-align:center;">
+            <div style="background:var(--blue); color:#fff; border-radius:var(--radius); padding:14px 10px;">
+              <div style="font-size:1.1rem; font-weight:900; color:var(--green)">$120k</div>
+              <div style="font-size:.72rem; margin-top:4px; color:rgba(255,255,255,.8)">SIGH (notre projet)</div>
+            </div>
+            <div style="background:var(--blue-pale); border-radius:var(--radius); padding:14px 10px;">
+              <div style="font-size:1.1rem; font-weight:900; color:#e53e3e">$350k+</div>
+              <div style="font-size:.72rem; margin-top:4px; color:var(--text-light)">Solutions internationales</div>
+            </div>
+            <div style="background:var(--blue-pale); border-radius:var(--radius); padding:14px 10px;">
+              <div style="font-size:1.1rem; font-weight:900; color:#e67e22">$200k+</div>
+              <div style="font-size:.72rem; margin-top:4px; color:var(--text-light)">Logiciels caraïbes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PIE CHART -->
+      <div class="pie-wrap anim delay-3">
+        <h4 style="font-size:.95rem; font-weight:700; color:var(--text-dark); text-align:center;">Répartition du budget</h4>
+        <div style="position:relative; display:inline-block;">
+          <div class="pie-chart">
+            <div class="pie-center">
+              <div style="font-size:1.4rem; font-weight:900; color:var(--blue)">$120k</div>
+              <div style="font-size:.65rem; color:var(--text-light); margin-top:2px">Budget total</div>
+            </div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--blue);"></div>
+            <span>Développement logiciel</span>
+            <b>40% — $48k</b>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#e67e22;"></div>
+            <span>Infrastructure & Matériel</span>
+            <b>30% — $36k</b>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--green);"></div>
+            <span>Formation du personnel</span>
+            <b>20% — $24k</b>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#9b59b6;"></div>
+            <span>Maintenance & Support</span>
+            <b>10% — $12k</b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     SLIDE 6 — CTA / CONTACT
+=================================================== -->
+<section class="slide" id="slide-6">
+  <div class="slide-inner">
+    <div class="slide-badge anim" style="border-color:var(--green); color:rgba(255,255,255,.7);">
+      Passons à l'action
+    </div>
+    <h2 class="section-title anim delay-1">Prêts à construire<br/><em style="color:var(--green);">l'hôpital de demain</em></h2>
+    <p class="section-subtitle anim delay-2">
+      Une phase pilote de 6 mois sur un hôpital du département du Sud. Des résultats concrets, mesurés et documentés pour guider le déploiement à grande échelle.
+    </p>
+
+    <div class="cta-grid">
+      <!-- FORM -->
+      <div class="contact-form anim delay-2">
+        <h3 style="color:#fff; font-size:1.05rem; font-weight:800; margin-bottom:20px;">
+          Rejoindre le projet SIGH
+        </h3>
+        <form id="contact-form" onsubmit="handleSubmit(event)">
+          <div class="form-row">
+            <label>Nom complet</label>
+            <input type="text" placeholder="Votre nom" required />
+          </div>
+          <div class="form-row">
+            <label>Organisation / Institution</label>
+            <input type="text" placeholder="Votre établissement ou organisation" required />
+          </div>
+          <div class="form-row">
+            <label>Rôle dans le projet</label>
+            <select required>
+              <option value="" disabled selected>Sélectionner…</option>
+              <option>Partenaire financier / Bailleur</option>
+              <option>Autorité sanitaire (MSPP/DDS)</option>
+              <option>Directeur d'hôpital</option>
+              <option>Développeur / Technicien</option>
+              <option>ONG / Partenaire international</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Adresse e-mail</label>
+            <input type="email" placeholder="votre@email.com" required />
+          </div>
+          <div class="form-row">
+            <label>Message</label>
+            <textarea placeholder="Décrivez votre intérêt pour le projet…"></textarea>
+          </div>
+          <button type="submit" class="btn-submit">
+            Envoyer
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="cta-right">
+        <div class="cta-highlight anim delay-3">
+          <h3>Phase Pilote — 6 mois</h3>
+          <p>
+            Nous cherchons <strong>1 à 2 hôpitaux partenaires</strong> pour la phase pilote. En échange, vous bénéficiez d'un déploiement à coût réduit, d'une équipe dédiée sur site, et d'un accès prioritaire à toutes les mises à jour futures.
+          </p>
+          <div class="tag-row" style="margin-top:14px;">
+            <span class="tag" style="background:rgba(46,204,113,.2); color:var(--green);">Mois 1-2 : Déploiement</span>
+            <span class="tag" style="background:rgba(46,204,113,.2); color:var(--green);">Mois 3-4 : Formation</span>
+            <span class="tag" style="background:rgba(46,204,113,.2); color:var(--green);">Mois 5-6 : Évaluation</span>
+          </div>
+        </div>
+
+        <a href="#contact-form" class="pilot-btn anim delay-4">
+          Lancer le Pilote
+        </a>
+
+        <div class="teams-section anim delay-5">
+          <div class="team-label">Équipes de l'initiative</div>
+
+          <div class="team-card">
+            <div class="team-card-role">Développement logiciel</div>
+            <div class="team-card-name">Thierry &amp; son équipe</div>
+            <div class="team-card-desc">
+              Conception, développement et déploiement de la plateforme SIGH — architecture, modules métier et interface utilisateur.
+            </div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-card-role">Direction technique &amp; infrastructure</div>
+            <div class="team-card-name">Ing. Stéphane</div>
+            <div class="team-card-desc">
+              Supervision technique, infrastructure réseau, sécurité des données et coordination avec les établissements partenaires.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     FOOTER
+=================================================== -->
+<footer>
+  <p>
+    <strong>SIGH</strong> — Système d'Information pour la Gestion Hospitalière &nbsp;|&nbsp;
+    Département du Sud, Haïti &nbsp;|&nbsp;
+    © 2026 Initiative SIGH — Thierry &amp; Ing. Stéphane. Tous droits réservés.
+  </p>
+</footer>
+
+<!-- ── SCROLL TOP ── -->
+<button id="scroll-top" title="Retour en haut" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ── TOAST ── -->
+<div id="toast">Message envoyé — nous reviendrons vers vous rapidement.</div>
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+<script>
+  /* ── PROGRESS BAR ── */
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+    bar.style.width = pct + '%';
+  });
+
+  /* ── SCROLL-TO-TOP ── */
+  const scrollTopBtn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => {
+    scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  /* ── ACTIVE NAV LINK ── */
+  const slides = document.querySelectorAll('.slide');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const observerNav = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const target = document.querySelector('.nav-link[href="#' + entry.target.id + '"]');
+        if (target) target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.5 });
+
+  slides.forEach(s => observerNav.observe(s));
+
+  /* ── SCROLL ANIMATIONS ── */
+  const animEls = document.querySelectorAll('.anim');
+  const observerAnim = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+
+  animEls.forEach(el => observerAnim.observe(el));
+
+  /* ── FORM SUBMIT ── */
+  function handleSubmit(e) {
+    e.preventDefault();
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+    e.target.reset();
+  }
+
+  /* ── SMOOTH SCROLL FOR ANCHOR LINKS ── */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  /* ── PIE CHART ANIMATION ON SCROLL ── */
+  const pie = document.querySelector('.pie-chart');
+  if (pie) {
+    const piObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        pie.style.transition = 'transform 1s ease, box-shadow .5s ease';
+        pie.style.transform = 'rotate(0deg) scale(1)';
+        pie.style.animation = 'pieIn .8s ease forwards';
+        piObserver.disconnect();
+      }
+    }, { threshold: 0.5 });
+    piObserver.observe(pie);
+  }
+
+  /* ── KEYBOARD NAV ── */
+  document.addEventListener('keydown', (e) => {
+    const all = Array.from(slides);
+    const current = all.find(s => {
+      const r = s.getBoundingClientRect();
+      return r.top <= 80 && r.bottom > 80;
+    });
+    if (!current) return;
+    const idx = all.indexOf(current);
+    if ((e.key === 'ArrowDown' || e.key === 'PageDown') && idx < all.length - 1) {
+      all[idx + 1].scrollIntoView({ behavior: 'smooth' });
+    }
+    if ((e.key === 'ArrowUp' || e.key === 'PageUp') && idx > 0) {
+      all[idx - 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+</script>
+
+</body>
+</html>
